@@ -38,3 +38,6 @@ reserva1 = Reserva(cliente1, habitacion1)
 
 print(reserva1.confirmar_reserva())
 print(habitacion1)
+
+
+#
