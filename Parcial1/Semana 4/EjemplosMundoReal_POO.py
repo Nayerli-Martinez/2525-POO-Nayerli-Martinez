@@ -33,7 +33,7 @@ class Reserva:
 
 # Ejemplo de uso
 habitacion1 = Habitacion(101, "Suite", 120)
-cliente1 = Cliente("Juan Pérez", "1234567890")
+cliente1 = Cliente("Nayerli Martinez", "1050366887")
 reserva1 = Reserva(cliente1, habitacion1)
 
 print(reserva1.confirmar_reserva())
