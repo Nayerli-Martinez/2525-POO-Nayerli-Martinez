@@ -65,3 +65,4 @@ jaula1.agregar_animal(gato1)
 
 print("\n Animales en la jaula:")
 jaula1.mostrar_habitantes()
+
