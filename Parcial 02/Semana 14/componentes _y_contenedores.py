@@ -1,48 +1,69 @@
-# Importamos los módulos necesarios
+## Importamos los módulos necesarios
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import DateEntry  # Widget para seleccionar fechas con calendario
 from datetime import date         # Para trabajar con fechas válidas
+import json                       # Para guardar y cargar datos en formato JSON
 
+# Función para guardar los eventos actuales en un archivo JSON
+def guardar_eventos_en_json():
+    eventos = []
+    # Recorremos todos los elementos del Treeview
+    for item in tree.get_children():
+        valores = tree.item(item)['values']
+        eventos.append({
+            "fecha": valores[0],
+            "hora": valores[1],
+            "descripcion": valores[2]
+        })
+    # Guardamos la lista de eventos en un archivo JSON
+    with open("eventos.json", "w", encoding="utf-8") as f:
+        json.dump(eventos, f, ensure_ascii=False, indent=4)
+
+# Función para cargar eventos desde el archivo JSON al iniciar la app
+def cargar_eventos_desde_json():
+    try:
+        with open("eventos.json", "r", encoding="utf-8") as f:
+            eventos = json.load(f)
+            # Insertamos cada evento en el Treeview
+            for evento in eventos:
+                tree.insert('', 'end', values=(evento["fecha"], evento["hora"], evento["descripcion"]))
+    except FileNotFoundError:
+        # Si el archivo no existe, simplemente no cargamos nada
+        pass
 
 # Función que se ejecuta al hacer clic en "Agregar Evento"
 def agregar_evento():
-    # Obtenemos los valores ingresados por el usuario
     fecha = date_entry.get()
     hora = hora_entry.get()
     descripcion = descripcion_entry.get()
 
     # Verificamos que todos los campos estén llenos
     if fecha and hora and descripcion:
-        # Insertamos el evento en el Treeview (lista de eventos)
-        tree.insert('', 'end', values=(fecha, hora, descripcion))
+        tree.insert('', 'end', values=(fecha, hora, descripcion))  # Agregamos al Treeview
+        guardar_eventos_en_json()  # Guardamos en el archivo JSON
 
         # Limpiamos los campos de entrada
-        date_entry.set_date(date.today())  # Restablecemos la fecha al día actual
-        hora_entry.delete(0, tk.END)       # Borramos el campo de hora
-        descripcion_entry.delete(0, tk.END)  # Borramos la descripción
+        date_entry.set_date(date.today())
+        hora_entry.delete(0, tk.END)
+        descripcion_entry.delete(0, tk.END)
     else:
-        # Mostramos una advertencia si algún campo está vacío
         messagebox.showwarning("Campos vacíos", "Por favor completa todos los campos.")
-
 
 # Función que se ejecuta al hacer clic en "Eliminar Evento Seleccionado"
 def eliminar_evento():
-    seleccionado = tree.selection()  # Obtenemos el evento seleccionado en la lista
+    seleccionado = tree.selection()
     if seleccionado:
-        # Mostramos un diálogo de confirmación antes de eliminar
         confirmar = messagebox.askyesno("Confirmar eliminación", "¿Deseas eliminar el evento seleccionado?")
         if confirmar:
-            tree.delete(seleccionado)  # Eliminamos el evento
+            tree.delete(seleccionado)  # Eliminamos del Treeview
+            guardar_eventos_en_json()  # Actualizamos el archivo JSON
     else:
-        # Mostramos un mensaje si no hay ningún evento seleccionado
         messagebox.showinfo("Sin selección", "Selecciona un evento para eliminar.")
-
 
 # Función que se ejecuta al hacer clic en "Salir"
 def salir():
     root.destroy()  # Cierra la aplicación
-
 
 # Configuración de la ventana principal
 root = tk.Tk()
@@ -60,6 +81,8 @@ tree.heading("Hora", text="Hora")
 tree.heading("Descripción", text="Descripción")
 tree.pack()
 
+# Cargamos los eventos guardados previamente (si existen)
+cargar_eventos_desde_json()
 
 # Frame para los campos de entrada
 frame_entrada = tk.Frame(root)
