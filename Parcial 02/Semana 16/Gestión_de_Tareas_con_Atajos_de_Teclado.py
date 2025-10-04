@@ -104,3 +104,5 @@ if __name__ == "__main__":
     root = tk.Tk()  # Crear ventana principal
     app = TaskManager(root)  # Instanciar la clase
     root.mainloop()  # Iniciar el bucle principal de la app
+
+
